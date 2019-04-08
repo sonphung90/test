@@ -1,0 +1,2468 @@
+{
+    "swagger": "2.0", 
+    "info": {
+        "title": "Rewards APIs", 	
+        "description": "# Overview\nRewards APIs provide functionalities to retrieve rewards balances, redeemed rewards and rebates including historical information. Rewards Identifier can either be Programme or Card account number. These APIs also provides functionalities to view Rewards Catalogue items and redeem Rewards as miles, Vouchers, Cashback for your earned Rewards points.\n\n# Version History\nVersion | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.0      | July, 2018   | Added new API **Retrieve Rewards Summary**. Added new fields **grossAmount** and **merchantId** to **Pay merchant using Rewards points** and **Pay merchant using daily$** API.  Added new field **uuid** for all APIs.\n\n# Authentication\n<!-- ReDoc-Inject: <security-definitions> -->\n\n# Pagination\nPagination is not available on this API.\n\n# Frequently Asked Question\nQ1: How to get list of Active Rewards account?\n\nAns: Get list of Active rewards account using **/parties/{partyId}/rewards** with path parameters PartyId\n\nQ2:  How to return rewards rebate transaction history?\n\nAns: Get rewards rebate transaction history for a given rewards identifier using **/rewards/{rewardsId}/rebatesTransactions** with path parameters rewardsId. Note: Start date and End Date is mandatory.\n\nQ3: How to redeem Rewards as Miles, Vouchers, or Cashback?\n\nAns: Get the redemption of Rewards to get Miles or Loyalty points, Vouchers or Cashback using **/rewards/milesConversion/rewards/vouchersRedemption** , **/rewards/rebatesCashback**\n\nQ4: How to invoke partial redemption for Rewards?\n\nAns: Enter the total amount of the transaction in the grossAmount field and the amount to be redeemed via rewards in the redeemAmount field when calling the **/rewards/{rewardsId}/paymentByPoints** or **/rewards/{rewardsId}/paymentByRebates**.\n\n# Known Issues\nThis API has no pending issues at the moment. Want to report a new issue? please help us **here**\n\n# Throttling (Rate Limits)\nWe throttle our APIs by default to ensure maximum performance for all developers.\n\n", 
+        "version": "1.0"
+    }, 
+    "host": "www.dbs.com/sandbox", 
+    "schemes": [
+        "https"
+    ], 
+    "basePath": "/api/sg/v1", 
+    "produces": [
+        "application/json"
+    ], 
+    "securityDefinitions": {
+        "accessToken": {
+            "description": "For accessing the API, a valid JWT token must be passed as part of the headers. You can obtain one through the authorization steps. Please go through the &quot;How it Works&quot; section for more details.\n", 
+            "type": "oauth2", 
+            "authorizationUrl": "https://www.dbs.com/sandbox/api/sg/v1/oauth/authorize", 
+            "tokenUrl": "https://www.dbs.com/sandbox/api/sg/v1/oauth/token", 
+            "flow": "accessCode"
+        }
+    }, 
+    "paths": {
+        "/parties/{partyId}/rewards": {
+            "get": {
+                "summary": "Retrieve List of Rewards Accounts", 
+                "description": "Return a list of the active rewards accounts with the rewards for a given party identifier.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   | Added new field **uuid** in request body\n\n", 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access Token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "partyId", 
+                        "in": "path", 
+                        "description": "Tokenised Party Identifier", 
+                        "type": "string", 
+                        "required": true
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "tags": [
+                    "Rewards"
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "List of rewards accounts are returned", 
+                        "schema": {
+                            "$ref": "#/definitions/rewards"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/points": {
+            "get": {
+                "summary": "Retrieve Rewards Points Balances", 
+                "description": "Return rewards points balances for a given rewards identifier.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access Token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "type": "string", 
+                        "required": true
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "tags": [
+                    "Rewards"
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Rewards points balances are returned", 
+                        "schema": {
+                            "$ref": "#/definitions/pointsBalances"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/rebates": {
+            "get": {
+                "summary": "Retrieve Rewards Rebates Balances", 
+                "description": "Return rewards rebates balances for a given rewards identifier.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access Token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "type": "string", 
+                        "required": true
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "tags": [
+                    "Rewards"
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Rewards rebates balances are returned", 
+                        "schema": {
+                            "$ref": "#/definitions/rebatesBalances"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/pointsTransactions": {
+            "get": {
+                "summary": "Retrieve Rewards Points Transaction History", 
+                "description": "Return rewards points transaction history for a given rewards Identifier and date range.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "tags": [
+                    "Rewards"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "startDate", 
+                        "in": "query", 
+                        "description": "Start Date. Format is YYYY-MM-DD", 
+                        "required": true, 
+                        "type": "string", 
+                        "format": "date"
+                    }, 
+                    {
+                        "name": "endDate", 
+                        "in": "query", 
+                        "description": "End date. Format is YYYY-MM-DD", 
+                        "required": true, 
+                        "type": "string", 
+                        "format": "date"
+                    }, 
+                    {
+                        "name": "cursor", 
+                        "in": "query", 
+                        "description": "Cursor", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Rewards Points Transaction history is returned.", 
+                        "schema": {
+                            "$ref": "#/definitions/rewardsPointsTransactions"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Authentication failure"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "System Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }, 
+                    "504": {
+                        "description": "Gate way timeout"
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/rebatesTransactions": {
+            "get": {
+                "summary": "Retrieve Rewards Rebates Transaction History", 
+                "description": "Return rewards rebates transaction history for a given rewards Identifier and date range.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "tags": [
+                    "Rewards"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "startDate", 
+                        "in": "query", 
+                        "description": "Start Date. Format is YYYY-MM-DD", 
+                        "required": true, 
+                        "type": "string", 
+                        "format": "date"
+                    }, 
+                    {
+                        "name": "endDate", 
+                        "in": "query", 
+                        "description": "End date. Format is YYYY-MM-DD", 
+                        "required": true, 
+                        "type": "string", 
+                        "format": "date"
+                    }, 
+                    {
+                        "name": "cursor", 
+                        "in": "query", 
+                        "description": "Cursor", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Rewards Points Transaction history is returned.", 
+                        "schema": {
+                            "$ref": "#/definitions/rewardsRebatesTransactions"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Authentication failure"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "System Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }, 
+                    "504": {
+                        "description": "Gate way timeout"
+                    }
+                }
+            }
+        }, 
+        "/rewards/catalogue": {
+            "get": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Retrieve Rewards Catalogue items", 
+                "description": "Retrieves the list of items available in the Rewards Catalogue. Filters July be applied based on Customer or Account.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "partyId", 
+                        "in": "query", 
+                        "description": "Tokenized Party identifier", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "cardId", 
+                        "in": "query", 
+                        "description": "Tokenized Card or Account identifier", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "category", 
+                        "in": "query", 
+                        "description": "Category of Reward items", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Rewards Catalogue retrieval successful", 
+                        "schema": {
+                            "$ref": "#/definitions/rewardsCatalogue"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/catalogue/{itemId}": {
+            "get": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Retrieve Reward Catalogue item details", 
+                "description": "Returns the details of the reward item from the Reward Catalogue.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "itemId", 
+                        "in": "path", 
+                        "description": "Catalogue item identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Reward Catalogue Item details", 
+                        "schema": {
+                            "$ref": "#/definitions/catalogueItemDetl"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/milesConversion": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Redeem Rewards as miles", 
+                "description": "Initiates the redemption of Rewards to get miles or loyalty points.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsRedemption", 
+                        "in": "body", 
+                        "description": "Rewards Redemption details", 
+                        "required": true, 
+                        "schema": {
+                            "$ref": "#/definitions/milesRedemptionRequest"
+                        }
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "201": {
+                        "description": "Reward Redemption successful", 
+                        "schema": {
+                            "$ref": "#/definitions/milesRedemptionResult"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/vouchersRedemption": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Redeem Rewards as Vouchers", 
+                "description": "Initiates the redemption of Rewards to get Voucher(s).\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsRedemption", 
+                        "in": "body", 
+                        "description": "Rewards Redemption details", 
+                        "required": true, 
+                        "schema": {
+                            "$ref": "#/definitions/vouchersRedemptionRequest"
+                        }
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "201": {
+                        "description": "Reward Redemption successful", 
+                        "schema": {
+                            "$ref": "#/definitions/vouchersRedemptionResult"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/rebatesCashback": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Redeem Rewards as Cashback", 
+                "description": "Initiates the redemption of Rewards to get Cashback.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+					{
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsRedemption", 
+                        "in": "body", 
+                        "description": "Rewards Redemption details", 
+                        "required": true, 
+                        "schema": {
+                            "$ref": "#/definitions/rebatesRedemptionRequest"
+                        }
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "201": {
+                        "description": "Reward Redemption successful", 
+                        "schema": {
+                            "$ref": "#/definitions/rebatesRedemptionResult"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/balanceCheck": {
+            "get": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Check if balance is sufficient for the bill amount", 
+                "description": "This API can be used to in two ways - One is to check the available Rewards balance and the other is to check if the bill amount can be covered with the available Rewards balance. In the second case, if the balance is less than the bill amount, then available Cash value equivalent of Rewards balance is returned.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "type": "string", 
+                        "required": true
+                    }, 
+                    {
+                        "name": "amount", 
+                        "in": "query", 
+                        "description": "Bill amount for which Rewards balance has to be checked for sufficiency", 
+                        "type": "number", 
+                        "required": false
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Rewards balance checked against the provided bill/redemption amount.", 
+                        "schema": {
+                            "$ref": "#/definitions/balanceCheck"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/conversionRates": {
+            "get": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Retrieve conversion rates for Points/Daily$", 
+                "description": "Returns the conversion rates to redeem customer's' Points or Rebates for the Merchant's products/services. The rates could optionally vary based on the Merchant as well (currently not in scope).\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   |Added new field **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "merchantId", 
+                        "in": "header", 
+                        "description": "Merchant Identifier", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "type": "string", 
+                        "required": true
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "200": {
+                        "description": "Rewards conversion rates", 
+                        "schema": {
+                            "$ref": "#/definitions/conversionRates"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/paymentByPoints": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Pay merchant using Rewards Points", 
+                "description": "Initiates the redemption of Points for payments to a Merchant partner. The referenceId and orderId must be unique for each request. However, if invoking this API more than once because of error in previous attempt, then orderId can be same but referenceId must be (different and) unique.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the *'accept-version'* passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   | Added new fields **grossAmount**, **merchantId** and **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "type": "string", 
+                        "required": true
+                    }, 
+                    {
+                        "name": "paymentByPoints", 
+                        "in": "body", 
+                        "description": "Payment through Redemption", 
+                        "required": true, 
+                        "schema": {
+                            "$ref": "#/definitions/paymentRequest"
+                        }
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "201": {
+                        "description": "Results of payment using Points", 
+                        "schema": {
+                            "$ref": "#/definitions/paymentByPoints"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        }, 
+        "/rewards/{rewardsId}/paymentByRebates": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Pay merchant using daily$", 
+                "description": "Initiates the redemption of Daily$ for payments to a Merchant partner. The referenceId and orderId must be unique for each request. However, if invoking this API more than once because of error in previous attempt, then orderId can be same but referenceId must be (different and) unique.\n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\naccept-version | Release date | Change Log\n--------|--------------|----------------------\n1.0      | October, 2017   | Base version of API\n1.1      | July, 2018   | Added new fields **grossAmount**, **merchantId** and **uuid** in request body\n\n", 
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "rewardsId", 
+                        "in": "path", 
+                        "description": "Tokenised Rewards Identifier", 
+                        "type": "string", 
+                        "required": true
+                    }, 
+                    {
+                        "name": "paymentRequest", 
+                        "in": "body", 
+                        "description": "Payment through Redemption", 
+                        "required": true, 
+                        "schema": {
+                            "$ref": "#/definitions/paymentRequest"
+                        }
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": false, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "201": {
+                        "description": "Results of payment using Daily$", 
+                        "schema": {
+                            "$ref": "#/definitions/paymentByRebates"
+                        }
+                    }, 
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            }
+        }, 
+		"/rewards/paymentReversal": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ], 
+                "summary": "Initiate reversal of rewards redemption", 
+                "description": "Initiates reversal of rewards redemptions. This is applicable to a successful redemption transaction with DBS points or Daily$. This can be used for refund of service or voiding a transaction. \n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\n",
+                "consumes": [
+                    "application/json"
+                ], 
+                "produces": [
+                    "application/json"
+                ], 
+                "parameters": [
+                    {
+                        "name": "clientId", 
+                        "in": "header", 
+                        "description": "Client Identifier", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accessToken", 
+                        "in": "header", 
+                        "description": "Access Token", 
+                        "required": true, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "accept-version", 
+                        "in": "header", 
+                        "description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+                        "required": false, 
+                        "type": "string"
+                    }, 
+                    {
+                        "name": "reversalRequest", 
+                        "in": "body", 
+                        "required": true, 
+                        "schema": {
+                            "$ref": "#/definitions/reversalRequest"
+                        }
+                    }, 
+                    {
+                        "description": "Message UID", 
+                        "required": true, 
+                        "type": "string", 
+                        "name": "uuid", 
+                        "in": "header"
+                    }
+                ], 
+                "responses": {
+                    "201": {
+                        "description": "Results of redemption reversal", 
+                        "schema": {
+                            "$ref": "#/definitions/reversalResponse"
+                        }
+                    },
+					"400":{
+						"description": "Bad Request"
+					},					
+                    "403": {
+                        "description": "Forbidden"
+                    }, 
+                    "404": {
+                        "description": "Not Found"
+                    }, 
+                    "500": {
+                        "description": "Internal Server Error", 
+                        "schema": {
+                            "$ref": "#/definitions/errorList"
+                        }
+                    }
+                }
+            }
+        },
+		"/parties/{partyId}/rewardsSummary":{
+			"get":{
+				"tags": ["Rewards"],
+				"summary": "Retrieve Rewards Summary",
+				"description": "Returns a list of rewards accounts with the available rewards balance for a given party identifier and its corresponding conversion rate. If amount is specified, it checks whether the rewards balances is sufficient for the bill amount. Otherwise, it shows the minimum and total redeemable amounts of the rewards accounts. \n\n*Important*: The table below describes the changes in the API behaviour according to the value of the 'accept-version' passed in the request header. Setting a specific version is recommended to invoke the desired message-set, unless the most recent version is required.\n\n",
+				"parameters": [
+					{
+						"name": "clientId", 
+						"in": "header", 
+						"description": "Client Identifier", 
+						"required": true, 
+						"type": "string"
+					}, 
+					{
+						"name": "accessToken", 
+						"in": "header", 
+						"description": "Access Token", 
+						"required": true, 
+						"type": "string"
+					}, 
+					{
+						"name": "accept-version", 
+						"in": "header", 
+						"description": "Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2", 
+						"required": false, 
+						"type": "string"
+					},
+					{
+						"description": "Message UID", 
+						"required": true, 
+						"type": "string", 
+						"name": "uuid", 
+						"in": "header"
+					},
+					{
+						"name": "partyId", 
+						"in": "path", 
+						"description": "Tokenised Party Identifier", 
+						"type": "string", 
+						"required": true
+					}, 
+					{
+						"name": "amount",
+						"description":"Bill amount for which Rewards balance has to be checked for sufficiency",
+						"in": "query",
+						"required": false,
+						"type":"number"
+					},
+					{
+						"name": "merchantId",
+						"description": "Identifier for the merchant involved in the transaction",
+						"in": "query",
+						"required": false,
+						"type": "number"
+					}
+				],
+				"responses": {
+					 "200": {
+							"description": "Summary of rewards accounts are returned", 
+							"schema": {
+								"$ref": "#/definitions/rewardsSummary"
+							}
+						},
+						"400": {
+							"description": "Bad Request"
+						},
+						"403": {
+							"description": "Forbidden"
+						}, 
+						"404": {
+							"description": "Not Found"
+						}, 
+						"500": {
+							"description": "Internal Server Error", 
+							"schema": {
+								"$ref": "#/definitions/errorList"
+							}
+						}
+					}
+			}
+		}
+    }, 
+    "definitions": {
+        "errorList": {
+            "description": "List of errors", 
+            "type": "array", 
+            "items": {
+                "$ref": "#/definitions/error"
+            }
+        }, 
+        "error": {
+            "type": "object", 
+            "properties": {
+                "code": {
+                    "description": "Error code", 
+                    "type": "string"
+                }, 
+                "message": {
+                    "type": "string", 
+                    "description": "Error message"
+                }, 
+                "moreInfo": {
+                    "type": "string", 
+                    "description": "Additional information about the error"
+                }
+            }
+        }, 
+        "rewards": {
+            "type": "object", 
+            "properties": {
+                "cardRewardsAccounts": {
+                    "description": "Card rewards accounts", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/cardRewardsAccount"
+                    }
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "cardRewardsAccount": {
+            "description": "Card rewards account details", 
+            "type": "object", 
+            "properties": {
+                "cardNumber": {
+                    "description": "Card Number.", 
+                    "type": "string"
+                }, 
+                "cardDescription": {
+                    "description": "Card Description.  Eg. DBS Black Card, POSB Everyday Card", 
+                    "type": "string"
+                }, 
+                "rewardsSchemes": {
+                    "description": "Rewards schemes", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/rewardsScheme"
+                    }
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rewardsScheme": {
+            "description": "Rewards Scheme", 
+            "type": "object", 
+            "properties": {
+                "id": {
+                    "description": "Tokenised Rewards Identifier.", 
+                    "type": "string"
+                }, 
+                "schemeName": {
+                    "description": "Scheme Name. Eg. DAILY$, SAFRA$, DBS Points", 
+                    "type": "string"
+                }, 
+                "rewardsScheme": {
+                    "description": "Rewards Scheme Type.  Eg. 'CR': Cash Rebates, 'BPT': Bonus Points", 
+                    "type": "string"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "cardId": {
+            "description": "Tokenized Card Identifier", 
+            "type": "string"
+        }, 
+        "pointsBalances": {
+            "description": "Rewards Points Balances", 
+            "type": "object", 
+            "properties": {
+                "schemeId": {
+                    "description": "Scheme Identifier", 
+                    "type": "string"
+                }, 
+                "schemeName": {
+                    "description": "Scheme Name. Eg. DAILY$, SAFRA$, DBS Points", 
+                    "type": "string"
+                }, 
+                "rewardsScheme": {
+                    "description": "Rewards Scheme Type.  Eg. 'CR': Cash Rebates, 'BPT': Bonus Points", 
+                    "type": "string"
+                }, 
+                "previousPoints": {
+                    "description": "Points earned as of last statement", 
+                    "type": "number"
+                }, 
+                "currentPoints": {
+                    "description": "Current points eligible for redemption", 
+                    "type": "number"
+                }, 
+                "newPointsEarned": {
+                    "description": "Points earned since last statement", 
+                    "type": "number"
+                }, 
+                "redeemedPoints": {
+                    "description": "Redeemed points since last statement", 
+                    "type": "number"
+                }, 
+                "adjustedInPoints": {
+                    "description": "Adjusted in points since last statement", 
+                    "type": "number"
+                }, 
+                "adjustedOutPoints": {
+                    "description": "Adjusted out points since last statement", 
+                    "type": "number"
+                }, 
+                "expiredPoints": {
+                    "description": "Expired points since last statement", 
+                    "type": "string"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rebatesBalances": {
+            "description": "Rewards Rebates Balances", 
+            "type": "object", 
+            "properties": {
+                "schemeId": {
+                    "description": "Scheme Identifier", 
+                    "type": "string"
+                }, 
+                "schemeName": {
+                    "description": "Scheme Name. Eg. DAILY$, SAFRA$, DBS Points", 
+                    "type": "string"
+                }, 
+                "rewardsScheme": {
+                    "description": "Rewards Scheme Type.  Eg. 'CR': Cash Rebates, 'BPT': Bonus Points", 
+                    "type": "string"
+                }, 
+                "previousBalance": {
+                    "description": "Balance as of last statement", 
+                    "type": "number"
+                }, 
+                "currentBalance": {
+                    "description": "Current balance eligible for redemption", 
+                    "type": "number"
+                }, 
+                "earnedValue": {
+                    "description": "Rebates value earned since last statement", 
+                    "type": "number"
+                }, 
+                "redeemedValue": {
+                    "description": "Rebates value redeemed since last statement", 
+                    "type": "number"
+                }, 
+                "adjustedInValue": {
+                    "description": "Adjusted in value since last statement", 
+                    "type": "number"
+                }, 
+                "adjustedOutValue": {
+                    "description": "Adjusted out value since last statement", 
+                    "type": "number"
+                }, 
+                "expiredValue": {
+                    "description": "Rebates value that have expired since last statement", 
+                    "type": "string"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rewardsPointsTransactions": {
+            "type": "object", 
+            "required": [
+                "transactionDetl"
+            ], 
+            "properties": {
+                "rewardsPointsTransaction": {
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/rewardsPointsTransaction"
+                    }
+                }, 
+                "recordControl": {
+                    "$ref": "#/definitions/recordControl"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rewardsRebatesTransactions": {
+            "type": "object", 
+            "required": [
+                "transactionDetl"
+            ], 
+            "properties": {
+                "rewardsRebatesTransaction": {
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/rewardsRebatesTransaction"
+                    }
+                }, 
+                "recordControl": {
+                    "$ref": "#/definitions/recordControl"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rewardsPointsTransaction": {
+            "description": "Rewards Points Transaction details", 
+            "type": "object", 
+            "required": [
+                "transactionReference", 
+                "transactionDate", 
+                "transactionDescription", 
+                "transactionAmount"
+            ], 
+            "properties": {
+                "transactionReference": {
+                    "description": "Transaction Reference Number", 
+                    "type": "string"
+                }, 
+                "transactionDate": {
+                    "description": "Date of Transaction", 
+                    "type": "string", 
+                    "format": "date"
+                }, 
+                "postingDate": {
+                    "description": "Date Transaction was posted on system", 
+                    "type": "string", 
+                    "format": "date"
+                }, 
+                "cardNumber": {
+                    "description": "Card Number", 
+                    "type": "string"
+                }, 
+                "transactionTypeDescription": {
+                    "description": "Transaction Type Description.  Eg. Award, Refund, Redeem, Adjust", 
+                    "type": "string"
+                }, 
+                "transactionCodeDescription": {
+                    "description": "Transaction Code Description", 
+                    "type": "string"
+                }, 
+                "transactionDescription": {
+                    "description": "Transaction Description", 
+                    "type": "string"
+                }, 
+                "grossTransactionAmount": {
+                    "$ref": "#/definitions/amount"
+                }, 
+                "netTransactionAmount": {
+                    "$ref": "#/definitions/amount"
+                }, 
+                "schemeId": {
+                    "description": "Scheme Identifier", 
+                    "type": "string"
+                }, 
+                "schemeName": {
+                    "description": "Scheme Name. Eg. DBS Points", 
+                    "type": "string"
+                }, 
+                "earnedPoints": {
+                    "description": "Earned points", 
+                    "type": "number"
+                }, 
+                "redeemedPoints": {
+                    "description": "Redeemed points", 
+                    "type": "number"
+                }, 
+                "adjustedPoints": {
+                    "description": "Adjusted points", 
+                    "type": "number"
+                }, 
+                "additionalReference": {
+                    "description": "Additional reference of the Transaction. Eg. Frequent Flyer Programme ID, CASA Account Number where rewards is credited", 
+                    "type": "string", 
+                    "maxLength": 50
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rewardsRebatesTransaction": {
+            "description": "Rewards Rebates Transaction details", 
+            "type": "object", 
+            "required": [
+                "transactionReference", 
+                "transactionDate", 
+                "transactionDescription", 
+                "transactionAmount"
+            ], 
+            "properties": {
+                "transactionReference": {
+                    "description": "Transaction Reference Number", 
+                    "type": "string"
+                }, 
+                "transactionDate": {
+                    "description": "Date of Transaction", 
+                    "type": "string", 
+                    "format": "date"
+                }, 
+                "postingDate": {
+                    "description": "Date Transaction was posted on system", 
+                    "type": "string", 
+                    "format": "date"
+                }, 
+                "cardNumber": {
+                    "description": "Card Number", 
+                    "type": "string"
+                }, 
+                "transactionTypeDescription": {
+                    "description": "Transaction Type Description.  Eg. Award, Refund, Redeem, Adjust", 
+                    "type": "string"
+                }, 
+                "transactionCodeDescription": {
+                    "description": "Transaction Code Description", 
+                    "type": "string"
+                }, 
+                "transactionDescription": {
+                    "description": "Transaction Description", 
+                    "type": "string"
+                }, 
+                "grossTransactionAmount": {
+                    "$ref": "#/definitions/amount"
+                }, 
+                "netTransactionAmount": {
+                    "$ref": "#/definitions/amount"
+                }, 
+                "schemeId": {
+                    "description": "Scheme Identifier", 
+                    "type": "string"
+                }, 
+                "schemeName": {
+                    "description": "Scheme Name. Eg. DAILY$, SAFRA$", 
+                    "type": "string"
+                }, 
+                "earnedValue": {
+                    "description": "Earned value", 
+                    "type": "number"
+                }, 
+                "redeemedValue": {
+                    "description": "Redeemed value", 
+                    "type": "number"
+                }, 
+                "adjustedValue": {
+                    "description": "Adjusted value", 
+                    "type": "number"
+                }, 
+                "additionalReference": {
+                    "description": "Additional reference of the Transaction. Eg. Frequent Flyer Programme ID, CASA Account Number where rewards is credited", 
+                    "type": "string", 
+                    "maxLength": 50
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "expiryDate": {
+            "description": "Expiry Date", 
+            "type": "string", 
+            "format": "date"
+        }, 
+        "amount": {
+            "description": "Amount", 
+            "type": "object", 
+            "properties": {
+                "amount": {
+                    "description": "Amount", 
+                    "type": "number"
+                }, 
+                "currency": {
+                    "description": "Currency type. ISO 4217 3-character currency code", 
+                    "type": "string"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "recordControl": {
+            "description": "Record control information", 
+            "type": "object", 
+            "properties": {
+                "matchedRecordCount": {
+                    "description": "Number of records matched", 
+                    "type": "integer"
+                }, 
+                "sentRecordCount": {
+                    "description": "Number of records sent", 
+                    "type": "integer"
+                }, 
+                "cursor": {
+                    "description": "Cursor for Processing", 
+                    "type": "string"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rebatesRedemptionResult": {
+            "description": "Redemption result details", 
+            "type": "object", 
+            "properties": {
+                "status": {
+                    "description": "Redemption request status", 
+                    "type": "string"
+                }, 
+                "orderId": {
+                    "description": "Redemption Order reference number for redemption request", 
+                    "type": "string"
+                }, 
+                "transactionFee": {
+                    "description": "Transaction Fee for redemption", 
+                    "$ref": "#/definitions/amount"
+                }
+            }
+        }, 
+        "rebatesRedemptionRequest": {
+            "description": "Reward Redemption request", 
+            "type": "object", 
+            "properties": {
+                "rewardAccountId": {
+                    "description": "Reward Account Identifier.", 
+                    "type": "string"
+                }, 
+                "schemeId": {
+                    "description": "Reward Scheme Identifier. Ex: Daily$, DBS Points, Air Miles etc.", 
+                    "type": "string"
+                }, 
+                "redemptionList": {
+                    "description": "Rebate Redemption list", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/redemptionDetl"
+                    }
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "voucherDetl": {
+            "description": "Reward item Image details", 
+            "type": "object", 
+            "properties": {
+                "voucherId": {
+                    "description": "Voucher identifier", 
+                    "type": "string"
+                }, 
+                "rewardItemId": {
+                    "description": "Reward Item identifier for reference", 
+                    "type": "string"
+                }, 
+                "issueDate": {
+                    "description": "Voucher Issue date", 
+                    "type": "string", 
+                    "format": "date"
+                }, 
+                "expiryDate": {
+                    "description": "Voucher Expiry date", 
+                    "type": "string", 
+                    "format": "date"
+                }
+            }
+        }, 
+        "vouchersRedemptionResult": {
+            "description": "Redemption result details", 
+            "type": "object", 
+            "properties": {
+                "status": {
+                    "description": "Redemption request status", 
+                    "type": "string"
+                }, 
+                "orderId": {
+                    "description": "Redemption Order reference number for redemption request", 
+                    "type": "string"
+                }, 
+                "vouchersList": {
+                    "description": "Redemption Vouchers", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/voucherDetl"
+                    }
+                }
+            }
+        }, 
+        "redemptionDetl": {
+            "description": "Reward Redemption details", 
+            "type": "object", 
+            "properties": {
+                "rewardItemId": {
+                    "description": "Reward Item identifier", 
+                    "type": "string"
+                }, 
+                "redeemQuantity": {
+                    "description": "Quantity of items to be redeemed", 
+                    "type": "number"
+                }, 
+                "redeemAmount": {
+                    "description": "Amount to be redeemed", 
+                    "type": "number"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "rewardsCatalogue": {
+            "description": "Reward Catalogue items", 
+            "type": "array", 
+            "items": {
+                "$ref": "#/definitions/catalogueItem"
+            }
+        }, 
+        "catalogueItem": {
+            "description": "Catalogue item", 
+            "type": "object", 
+            "properties": {
+                "id": {
+                    "description": "Catalogue item identifier", 
+                    "type": "string"
+                }, 
+                "itemType": {
+                    "description": "Reward item type", 
+                    "type": "string"
+                }, 
+                "quantityAvailable": {
+                    "description": "Available quantity of items", 
+                    "type": "number"
+                }, 
+                "price": {
+                    "description": "Price of the Reward Item. The price value can be Points or Amount", 
+                    "type": "number"
+                }, 
+                "tags": {
+                    "description": "Tags for the Reward Item", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/tag"
+                    }
+                }, 
+                "itemImage": {
+                    "description": "Images for the Reward Item", 
+                    "$ref": "#/definitions/itemImage"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "tag": {
+            "description": "Tag for Reward items", 
+            "type": "string"
+        }, 
+        "catalogueItemDetl": {
+            "description": "Catalogue item", 
+            "type": "object", 
+            "properties": {
+                "id": {
+                    "description": "Catalogue item identifier", 
+                    "type": "string"
+                }, 
+                "description": {
+                    "description": "Item description", 
+                    "type": "string"
+                }, 
+                "itemType": {
+                    "description": "Reward item type", 
+                    "type": "string"
+                }, 
+                "category": {
+                    "description": "Reward item category", 
+                    "type": "string"
+                }, 
+                "catalogueCode": {
+                    "description": "Reward Catalogue code", 
+                    "type": "string"
+                }, 
+                "quantityAvailable": {
+                    "description": "Available quantity of items", 
+                    "type": "number"
+                }, 
+                "validity": {
+                    "description": "Reward Item validity period", 
+                    "$ref": "#/definitions/validityPeriod"
+                }, 
+                "pricing": {
+                    "description": "Reward Item pricing details", 
+                    "$ref": "#/definitions/rewardPricing"
+                }, 
+                "termsConditions": {
+                    "description": "Terms and Conditions for redemption", 
+                    "type": "string"
+                }, 
+                "itemImages": {
+                    "description": "Images for the Reward Item", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/itemImage"
+                    }
+                }, 
+                "redemptionOutlets": {
+                    "description": "Redemption outlets", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/redemptionOutlet"
+                    }
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "validityPeriod": {
+            "description": "Validity period", 
+            "type": "object", 
+            "required": [
+                "startDate", 
+                "endDate"
+            ], 
+            "properties": {
+                "startDate": {
+                    "description": "Effective start date", 
+                    "type": "string", 
+                    "format": "date"
+                }, 
+                "endDate": {
+                    "description": "Effective end date", 
+                    "type": "string", 
+                    "format": "date"
+                }
+            }
+        }, 
+        "rewardPricing": {
+            "description": "Reward Item pricing details", 
+            "type": "object", 
+            "properties": {
+                "pointPrice": {
+                    "description": "Points needed to redeem", 
+                    "$ref": "#/definitions/amount"
+                }, 
+                "faceValue": {
+                    "description": "Actual value of the Reward item", 
+                    "$ref": "#/definitions/amount"
+                }, 
+                "additionalPayment": {
+                    "description": "Additional cash payment needed to redeem", 
+                    "$ref": "#/definitions/amount"
+                }
+            }
+        }, 
+        "itemImage": {
+            "description": "Reward item Image details", 
+            "type": "object", 
+            "properties": {
+                "imageId": {
+                    "description": "Identifier for the Image", 
+                    "type": "string"
+                }, 
+                "name": {
+                    "description": "Image name", 
+                    "type": "string"
+                }, 
+                "validity": {
+                    "description": "Reward Image validity details", 
+                    "$ref": "#/definitions/validityPeriod"
+                }
+            }
+        }, 
+        "redemptionOutlet": {
+            "description": "Reward redemption outlet details", 
+            "type": "object", 
+            "properties": {
+                "outletName": {
+                    "description": "Name of the outlet to redeem the reward item", 
+                    "type": "string"
+                }, 
+                "address": {
+                    "description": "Address of the outlet", 
+                    "type": "string"
+                }, 
+                "contact": {
+                    "description": "Contact details of the outlet", 
+                    "type": "string"
+                }
+            }
+        }, 
+        "milesRedemptionRequest": {
+            "description": "Reward Redemption request", 
+            "type": "object", 
+            "properties": {
+                "rewardAccountId": {
+                    "description": "Reward Account Identifier.", 
+                    "type": "string"
+                }, 
+                "schemeId": {
+                    "description": "Reward Scheme Identifier. Ex: Daily$, DBS Points, Air Miles etc.", 
+                    "type": "string"
+                }, 
+                "rewardItemId": {
+                    "description": "Reward Item identifier", 
+                    "type": "string"
+                }, 
+                "redeemQuantity": {
+                    "description": "Quantity of items to be redeemed", 
+                    "type": "number"
+                }, 
+                "membershipDetl": {
+                    "description": "Reward redemption to a Membership program account", 
+                    "$ref": "#/definitions/membershipDetl"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "membershipDetl": {
+            "description": "Membership program details to redeem Reward", 
+            "type": "object", 
+            "properties": {
+                "id": {
+                    "description": "Membership Identifier", 
+                    "type": "string"
+                }, 
+                "program": {
+                    "description": "Membership Type", 
+                    "type": "string"
+                }, 
+                "partyName": {
+                    "description": "Name as per the Membership program", 
+                    "$ref": "#/definitions/partyName"
+                }
+            }
+        }, 
+        "partyName": {
+            "description": "Party''''s Name", 
+            "type": "object", 
+            "properties": {
+                "firstName": {
+                    "description": "Party''''s First Name", 
+                    "type": "string"
+                }, 
+                "middleName": {
+                    "description": "Party''''s Middle Name", 
+                    "type": "string"
+                }, 
+                "lastName": {
+                    "description": "Party''''s Last Name (Surname)", 
+                    "type": "string"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "milesRedemptionResult": {
+            "description": "Redemption result details", 
+            "type": "object", 
+            "properties": {
+                "status": {
+                    "description": "Redemption request status", 
+                    "type": "string"
+                }, 
+                "orderId": {
+                    "description": "Redemption Order reference number for redemption request", 
+                    "type": "string"
+                }, 
+                "transactionFee": {
+                    "description": "Transaction Fee for redemption", 
+                    "$ref": "#/definitions/amount"
+                }
+            }
+        }, 
+        "vouchersRedemptionRequest": {
+            "description": "Reward Redemption request", 
+            "type": "object", 
+            "properties": {
+                "rewardAccountId": {
+                    "description": "Reward Account Identifier.", 
+                    "type": "string"
+                }, 
+                "schemeId": {
+                    "description": "Reward Scheme Identifier. Ex: Daily$, DBS Points, Air Miles etc.", 
+                    "type": "string"
+                }, 
+                "isCollatable": {
+                    "description": "Indicates whether the redemption items can be collated together into one reward item. Ex: 3 vouchers of $10 each can be redeemed as one $30 voucher", 
+                    "type": "string"
+                }, 
+                "redemptionList": {
+                    "description": "Redemption item list", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/redemptionDetl"
+                    }
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "balanceCheck": {
+            "description": "Results of balance check before redemption request", 
+            "type": "object", 
+            "properties": {
+                "requestedAmount": {
+                    "description": "Amount for which validation was requested on the Rewards balance.", 
+                    "$ref": "#/definitions/amount"
+                }, 
+                "isSufficient": {
+                    "description": "Indicates whether or not the balance is sufficient to cover the requested Amount.", 
+                    "type": "boolean"
+                }, 
+                "minimumRedeemableAmount": {
+                    "description": "Minimum Amount that can be redeemed for the Rewards scheme. This will be populated only when balance is not zero.", 
+                    "$ref": "#/definitions/amount"
+                }, 
+                "totalRedeemableAmount": {
+                    "description": "Total cash value balance that can be redeemed. This will be populated only when balance is insufficient to cover the requested amount.", 
+                    "$ref": "#/definitions/amount"
+                },
+				"totalRedeemablePoints":{
+					 "description": "Total DBS Points balance that can be redeemed. This will be populated only when balance is insufficient to cover the requested amount.",
+					"type": "number"
+				}
+            }, 
+            "additionalProperties": false
+        }, 
+        "conversionRates": {
+            "description": "Conversion rates from Points to Cash value", 
+            "type": "array", 
+            "items": {
+                "$ref": "#/definitions/rewardsExchangeRate"
+            }
+        }, 
+        "rewardsExchangeRate": {
+            "description": "Reward redemption outlet details", 
+            "type": "object", 
+            "properties": {
+                "currency": {
+                    "description": "Currency type. ISO 4217 3-character currency code", 
+                    "type": "string"
+                }, 
+                "units": {
+                    "description": "Units of currency. This is the base value for conversion", 
+                    "type": "number"
+                }, 
+                "pointsPerUnit": {
+                    "description": "Points needs per unit value of the currency", 
+                    "type": "number"
+                }
+            }
+        }, 
+        "paymentByRebates": {
+            "description": "Results of payment with Daily$", 
+            "type": "object", 
+            "properties": {
+                "referenceId": {
+                    "description": "Transaction Reference identifier for payment of remaining bill amount.", 
+                    "type": "string"
+                }, 
+                "redeemedAmount": {
+                    "description": "Amount that has been redeemed", 
+                    "$ref": "#/definitions/amount"
+                }, 
+                "remainingRebates": {
+                    "description": "Daily$ balance that is remaining", 
+                    "$ref": "#/definitions/amount"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "paymentByPoints": {
+            "description": "Results of payment with Reward points", 
+            "type": "object", 
+            "properties": {
+                "referenceId": {
+                    "description": "Transaction Reference identifier for payment of remaining bill amount.", 
+                    "type": "string"
+                }, 
+                "redeemedAmount": {
+                    "description": "Amount that has been redeemed", 
+                    "$ref": "#/definitions/amount"
+                }, 
+                "remainingPoints": {
+                    "description": "Points balance that is remaining", 
+                    "type": "number"
+                }, 
+                "remainingCashValue": {
+                    "description": "Cash value that is remaining", 
+                    "$ref": "#/definitions/amount"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "paymentRequest": {
+            "description": "Payment request using Reward points", 
+            "type": "object", 
+            "properties": {
+				"merchantId":{
+					"description": "Identifier for the merchant involved in the transaction.",
+					"type":"string"
+				},
+                "referenceId": {
+                    "description": "Transaction Reference identifier for payment request using Points.", 
+                    "type": "string"
+                }, 
+                "orderId": {
+                    "description": "Order Reference identifier for payment.", 
+                    "type": "string"
+                }, 
+                "grossAmount": {
+                    "description": "Total bill amount of the transaction", 
+                    "type": "object", 
+                    "properties": {
+                        "amount": {
+                            "description": "Amount", 
+                            "type": "number"
+                        }, 
+                        "currency": {
+                            "description": "Currency type. ISO 4217 3-character currency code", 
+                            "type": "string"
+                        }
+                    }
+                }, 
+                "redeemAmount": {
+                    "description": "Amount to be redeemed", 
+                    "type": "object", 
+                    "properties": {
+                        "amount": {
+                            "description": "Amount", 
+                            "type": "number"
+                        }, 
+                        "currency": {
+                            "description": "Currency type. ISO 4217 3-character currency code", 
+                            "type": "string"
+                        }
+                    }
+                }, 
+                "partyId": {
+                    "description": "Tokenized identifier of the Customer.", 
+                    "type": "string"
+                }
+            }, 
+            "additionalProperties": false
+        }, 
+        "reversalRequest": {
+            "description": "Details of redemption reversal of Rewards points and Daily$", 
+            "type": "object", 
+            "required": [
+                "reversalReferenceId", 
+                "redemptionReferenceId", 
+                "transactionDateTime", 
+                "grossAmount",
+				"redeemAmount",
+				"merchantId"
+            ], 
+            "properties": {
+				"merchantId":{
+					"description": "Identifier for the merchant involved in the transaction.",
+					"type":"string"
+				},
+                "reversalReferenceId": {
+                    "description": "Reference identifier for the redemption reversal request", 
+                    "type": "string"
+                }, 
+                "redemptionReferenceId": {
+                    "description": "Order reference identifier of the original redemption transaction", 
+                    "type": "string"
+                }, 
+                "transactionDateTime": {
+                    "description": "Timestamp of the original redemption transaction", 
+                    "type": "string", 
+                    "format": "date-time"
+                }, 
+                "grossAmount": {
+                    "description": "Total bill amount of the transaction", 
+                    "type": "object", 
+                    "properties": {
+                        "amount": {
+                            "description": "Amount", 
+                            "type": "number"
+                        }, 
+                        "currency": {
+                            "description": "Currency type. ISO 4217 3-character currency code", 
+                            "type": "string"
+                        }
+                    }
+                },
+				"redeemAmount": {
+					"description": "Amount redeemed",
+					"type": "object", 
+                    "properties": {
+                        "amount": {
+                            "description": "Amount", 
+                            "type": "number"
+                        }, 
+                        "currency": {
+                            "description": "Currency type. ISO 4217 3-character currency code", 
+                            "type": "string"
+                        }
+                    }
+				}
+            }, 
+            "additionalProperties": false
+        }, 
+        "reversalResponse": {
+            "description": "Results of redemption reversal of Reward points and Daily$", 
+            "type": "object", 
+            "properties": {
+                "reversalReferenceId": {
+                    "description": "Reference identifier for the redemption reversal.", 
+                    "type": "string"
+                }, 
+				"rewardsBalance": {
+					"description": "Redeemable amount after reversal, breakdown by account level",
+					"type": "object",
+					"properties":{
+						"remainingPoints": {
+                            "description": "Points balance that is remaining.", 
+							"type": "number"
+                        }, 
+                       "remainingCashValue": {
+							"description": "Cash value of the points or rebates remaining",
+							"type": "object", 
+							"properties": {
+								"amount": {
+									"description": "Amount", 
+									"type": "number"
+								}, 
+								"currency": {
+									"description": "Currency type. ISO 4217 3-character currency code", 
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+            } 
+			
+		},
+		"rewardsSummary": {
+			"type": "object",
+			"properties": {
+				"rewardsAccounts":{
+					"description": "List of rewards accounts", 
+                    "type": "array", 
+                    "items": {
+                        "$ref": "#/definitions/rewardsAccount"
+                    }
+				},
+				"rewardsBalancesSummary":{
+					"description": "Rewards balances summary",
+					"type": "object",
+					"properties":{
+						"requestedAmount":{
+							"description": "Amount for which validation was requested on the Rewards balance.", 
+							"type": "object", 
+							"properties": {
+								"amount": {
+									"description": "Amount", 
+									"type": "number"
+								}, 
+								"currency": {
+									"description": "Currency type. ISO 4217 3-character currency code", 
+									"type": "string"
+								}
+							}
+						},
+						"pointsBalancesSummary":{
+							"$ref":"#/definitions/pointsBalancesSummary"
+						},
+						"rebatesBalancesSummary":{
+							"$ref":"#/definitions/rebatesBalancesSummary"
+						}
+					}
+				}
+			},
+			"additionalProperties": false
+		},
+		"pointsBalancesSummary":{
+			"description": "Summary of Rewards Points balances",
+			"type":"object",
+			"properties":{
+				"isSufficient":{
+					"description": "Indicates whether or not the points balance is sufficient to cover the requested Amount. This will be populated if query amount is present.", 
+					"type": "boolean"
+				},
+				"minimumRedeemableAmount":{
+					"description": "Minimum Amount that can be redeemed for Points scheme. This will be populated if query amount is not present or exceeds the balance.", 
+					"type": "object", 
+					"properties": {
+						"amount": {
+							"description": "Amount", 
+							"type": "number"
+						}, 
+						"currency": {
+							"description": "Currency type. ISO 4217 3-character currency code", 
+							"type": "string"
+						}
+					}
+				},
+				"totalRedeemableAmount":{
+					"description": "Total cash value amount equivalent that can be redeemed for Points scheme. This will be populated if query amount is not present or exceeds the balance.", 
+					"type": "object", 
+					"properties": {
+						"amount": {
+							"description": "Amount", 
+							"type": "number"
+						}, 
+						"currency": {
+							"description": "Currency type. ISO 4217 3-character currency code", 
+							"type": "string"
+						}
+					}
+				},
+				"totalRedeemablePoints":{
+					"description": "Total number of points that can be redeemed.",
+					"type": "number"
+				}
+			}
+		},
+		"rebatesBalancesSummary":{
+			"description": "Summary of Rebates balances( Only Daily$ is supported for now)",
+			"type": "object",
+			"properties":{
+				"isSufficient":{
+					"description": "Indicates whether or not the Rebates balance is sufficient to cover the requested Amount. This will be populated if query amount is present.", 
+					"type": "boolean"
+				},
+				"minimumRedeemableAmount":{
+					"description": "Minimum Amount that can be redeemed for Rebates scheme. This will be populated if query amount is not present or exceeds the balance.", 
+					"type": "object", 
+					"properties": {
+						"amount": {
+							"description": "Amount", 
+							"type": "number"
+						}, 
+						"currency": {
+							"description": "Currency type. ISO 4217 3-character currency code", 
+							"type": "string"
+						}
+					}
+				},
+				"totalRedeemableAmount":{
+					"description": "Total cash value amount equivalent that can be redeemed for Rebates scheme. This will be populated if query amount is not present or exceeds the balance.", 
+					"type": "object", 
+					"properties": {
+						"amount": {
+							"description": "Amount", 
+							"type": "number"
+						}, 
+						"currency": {
+							"description": "Currency type. ISO 4217 3-character currency code", 
+							"type": "string"
+						}
+					}
+				},
+				"totalRedeemableRebates":{
+					"description": "Total value of Rebates that can be redeemed",
+					"type": "number"
+				}
+			}
+		},
+		"rewardsAccount":{
+			"description": "Rewards account details", 
+            "type": "object", 
+            "properties": {
+                "cardNumber": {
+                    "description": "Card Number.", 
+                    "type": "string"
+                }, 
+                "cardDescription": {
+                    "description": "Card Description.  Eg. DBS Black Card, POSB Everyday Card", 
+                    "type": "string"
+                }, 
+                "rewardsScheme": {
+                    "description": "Rewards scheme details", 
+                    "type": "object", 
+                    "properties": {
+						"id": {
+							"description": "Tokenised Rewards Identifier.", 
+							"type": "string"
+						}, 
+						"schemeName": {
+							"description": "Scheme Name. Eg. DAILY$, SAFRA$, DBS Points", 
+							"type": "string"
+						}, 
+						"rewardsScheme": {
+							"description": "Rewards Scheme Type.  Eg. 'CR': Cash Rebates, 'BPT': Bonus Points", 
+							"type": "string"
+						}
+					}
+				},
+				"conversionRates":{
+					"description": "Conversion rate for rewards scheme. Only available for Rewards points.",
+					"type":"object",
+					"properties":{
+						 "currency": {
+							"description": "Currency type. ISO 4217 3-character currency code", 
+							"type": "string"
+							}, 
+						"units": {
+							"description": "Units of currency. This is the base value for conversion", 
+							"type": "number"
+							}, 
+						"pointsPerUnit": {
+							"description": "Points needed per unit value of the currency", 
+							"type": "number"
+							}
+					}
+				}
+			}
+		}
+    }
+}
